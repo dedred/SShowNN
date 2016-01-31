@@ -23,7 +23,6 @@ void Init() {
 	window = SDL_CreateWindow("SDL_Shownn", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);
 	NetInit(WINDOW_WIDTH, WINDOW_HEIGHT);
-	NetComputeInit();
 	RenderInit(renderer, WINDOW_WIDTH, WINDOW_HEIGHT);
 	LogDebug("Init complete");
 }
@@ -31,6 +30,7 @@ void Init() {
 
 /* Deinitialize everything */
 void Done() {
+	NetDone();
 	RenderDone();
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
@@ -63,15 +63,19 @@ int main(int argc, char ** argv) {
 				case SDL_MOUSEBUTTONDOWN:
 					if (NetDataCount < MAX_DATA_IN) {
 						SDL_GetMouseState(&x, &y);
-						NetInput[NetDataCount][0] = (float)x / (float)WINDOW_WIDTH;
-						NetInput[NetDataCount][1] = (float)y / (float)WINDOW_HEIGHT;
+						RenderInput[NetDataCount][0] = x;
+						RenderInput[NetDataCount][1] = y;
+						NetInput[NetDataCount][0] = (float)x / WINDOW_WIDTH;
+						NetInput[NetDataCount][1] = (float)y / WINDOW_HEIGHT;
 						LogDebug("SDL_MOUSEBUTTONDOWN (%d, %d)", x, y);
 						if (event.button.button == SDL_BUTTON_LEFT) {
-							NetOutput[NetDataCount++][0] = 1;
+							NetOutput[NetDataCount][0] = 1;
 							LogDebug("Left click at %f,%f", NetInput[NetDataCount][0], NetInput[NetDataCount][1]);
+							NetDataCount++;
 						} else if (event.button.button == SDL_BUTTON_RIGHT) {
-							NetOutput[NetDataCount++][0] = 0;
+							NetOutput[NetDataCount][0] = 0;
 							LogDebug("Right click at %f,%f", NetInput[NetDataCount][0], NetInput[NetDataCount][1]);
+							NetDataCount++;
 						}
 					}
 					break;
@@ -97,7 +101,6 @@ int main(int argc, char ** argv) {
 				default:
 					break;
 			}
-			SDL_Delay(1);
 		}
 	}
 
