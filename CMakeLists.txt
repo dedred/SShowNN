@@ -11,6 +11,12 @@ find_package(SDL2 REQUIRED)
 add_definitions("-Wall")
 include_directories(${SDL2_INCLUDE_DIR})
 
-add_executable(sdl_shownn main.c)
+include_directories(/home/stu/docs/src/lwneuralnet-0.8/source)
+link_directories(/home/stu/docs/src/lwneuralnet-0.8/source)
+ADD_LIBRARY(lwneuralnet STATIC IMPORTED)
+SET_TARGET_PROPERTIES(lwneuralnet PROPERTIES IMPORTED_LOCATION /home/stu/docs/src/lwneuralnet-0.8/source/liblwneuralnet.a)
+
+
+add_executable(sdl_shownn render.c Log.c nnet.c main.c)
 install(TARGETS sdl_shownn DESTINATION bin)
-target_link_libraries(sdl_shownn ${SDL2_LIBRARIES})
+target_link_libraries(sdl_shownn lwneuralnet  ${SDL2_LIBRARIES})
